@@ -1,6 +1,6 @@
 contract;
-mod lib;
-use lib::{G1Point, G2Point, Scalar};
+
+use sway_ecc::{G1Point, G2Point, Scalar};
 
 // Scalar field size
 const R: u256 = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001u256;
@@ -57,10 +57,6 @@ const IC: [G1Point; 2] = [
     },
 ];
 
-storage {
-    counter: u64 = 0,
-}
-
 abi Groth16Verifier {
     fn verify_proof(
         p_a: [u256; 2],
@@ -77,14 +73,15 @@ impl Groth16Verifier for Contract {
         p_c: [u256; 2],
         pub_signals: [u256; 1],
     ) -> bool {
-        // check field
+        // check inputs < R
         let mut i = 0;
         while i < PUBLIC_INPUT_LEN {
-            if pub_signals[i] >= Q {
+            if pub_signals[i] >= R {
                 return false;
             }
             i += 1;
         }
+        // check element in proof < Q
         if p_a[0] >= Q || p_a[1] >= Q || p_b[0][0] >= Q || p_b[0][1] >= Q || p_b[1][0] >= Q || p_b[1][1] >= Q || p_c[0] >= Q || p_c[1] >= Q {
             return false;
         };
@@ -109,59 +106,46 @@ impl Groth16Verifier for Contract {
         };
 
         // check the pairing equation
-        let mut pairing_input: [u8; 768] = [0; 768];
+        let mut pairing_input: [u256; 24] = [0; 24];
         // neg A
         let a_neg = G1Point{
             x: p_a[0],
             y: (Q - p_a[1]) % Q
-        }.to_bytes();
-        let b = G2Point {
-            x: [p_b[0][0], p_b[0][1]],
-            y: [p_b[1][0], p_b[1][1]],
-        }.to_bytes();
-        let alpha = ALPHA.to_bytes();
-        let beta = BETA.to_bytes();
-        let x = x.to_bytes();
-        let gamma = GAMMA.to_bytes();
-        let c = G1Point {
-            x: p_c[0],
-            y: p_c[1],
-        }.to_bytes();
-        let delta = DELTA.to_bytes();
+        };
 
-        let mut i = 0;
-        while i < 64 {
-            pairing_input[i] = a_neg[i];
-            i += 1;
-        }
-        while i < 192 {
-            pairing_input[i] = b[i - 64];
-            i += 1;
-        }
-        while i < 256 {
-            pairing_input[i] = alpha[i-192];
-            i += 1;
-        }
-        while i < 384 {
-            pairing_input[i] = beta[i-256];
-            i += 1;
-        }
-        while i < 448 {
-            pairing_input[i] = x[i-384];
-            i += 1;
-        }
-        while i < 576 {
-            pairing_input[i] = gamma[i-448];
-            i += 1;
-        }
-        while i < 640 {
-            pairing_input[i] = c[i-576];
-            i += 1;
-        }
-        while i < 768 {
-            pairing_input[i] = delta[i-640];
-            i += 1;
-        }
+        // -A
+        pairing_input[0] = a_neg.x;
+        pairing_input[1] = a_neg.y;
+        // B
+        pairing_input[2] = p_b[0][0];
+        pairing_input[3] = p_b[0][1];
+        pairing_input[4] = p_b[1][0];
+        pairing_input[5] = p_b[1][1];
+        // alpha
+        pairing_input[6] = ALPHA.x;
+        pairing_input[7] = ALPHA.y;
+        // beta
+        pairing_input[8] = BETA.x[0];
+        pairing_input[9] = BETA.x[1];
+        pairing_input[10] = BETA.y[0];
+        pairing_input[11] = BETA.y[1];
+        // x
+        pairing_input[12] = x.x;
+        pairing_input[13] = x.y;
+        // gamma
+        pairing_input[14] = GAMMA.x[0];
+        pairing_input[15] = GAMMA.x[1];
+        pairing_input[16] = GAMMA.y[0];
+        pairing_input[17] = GAMMA.y[1];
+        // c
+        pairing_input[18] = p_c[0];
+        pairing_input[19] = p_c[1];
+        // delta
+        pairing_input[20] = DELTA.x[0];
+        pairing_input[21] = DELTA.x[1];
+        pairing_input[22] = DELTA.y[0];
+        pairing_input[23] = DELTA.y[1];
+
         let curve_id: u32 = 0;
         let groups_of_points: u32 = 4;
 
