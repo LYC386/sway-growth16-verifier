@@ -1,61 +1,36 @@
 contract;
 
-use sway_ecc::{G1Point, G2Point, Scalar};
-
 // Scalar field size
 const R: u256 = 0x30644e72e131a029b85045b68181585d2833e84879b9709143e1f593f0000001u256;
 // Base field size
 const Q: u256 = 0x30644e72e131a029b85045b68181585d97816a916871ca8d3c208c16d87cfd47u256;
 
 // Verification Key data
-const ALPHA = G1Point {
-    x: 0x259e483eac6675639c8131203859654b101d60953b0c74ed9e27c717384d6b8du256,
-    y: 0x19818d29ec709a530771dea371b7819c73d4dcbe0f5fad3bf858775842a91d3fu256,
-};
-const BETA = G2Point {
-    x: [
-        0x11ad0d4755480d587f72c0766c7182573a7f61f3f84090a88f5a8d24c1276da0u256,
-        0x2eae6bd9a84d2d05f8060973e06a8edcf10ff0bd697d746145d5395f25950bcau256,
-    ],
-    y: [
-        0x054ddc63046f86117db68009d923900a9769a7bbc7ff819cbe3eaedd9866b902u256,
-        0x0dd39ace0502b09ce211468563219d704ba3d199b2e4b372d2f11c06a8a4e6fau256,
-    ],
-};
-const GAMMA = G2Point {
-    x: [
-        0x198e9393920d483a7260bfb731fb5d25f1aa493335a9e71297e485b7aef312c2u256,
-        0x1800deef121f1e76426a00665e5c4479674322d4f75edadd46debd5cd992f6edu256,
-    ],
-    y: [
-        0x090689d0585ff075ec9e99ad690c3395bc4b313370b38ef355acdadcd122975bu256,
-        0x12c85ea5db8c6deb4aab71808dcb408fe3d1e7690c43d37b4ce6cc0166fa7daau256,
-    ],
-};
-const DELTA = G2Point {
-    x: [
-        0x05d482d0b371bbebdd56d9ceeeba2c600ccee0b2e08fa991867b6cad6f21d0ccu256,
-        0x0f24d96d5f427fcc4a30fe65a2a73162de28bd6324905f22c6437b488c5515e1u256,
-    ],
-    y: [
-        0x08f9635c9048c9e62ee2324f2d279cc108a43343a399984545e4114fdb784d20u256,
-        0x1a777d491272a6ef72a0030bded32fe11b990d828c4272ffe0b7448c71758459u256,
-    ],
-};
+const ALPHA_X: u256 = 0x259e483eac6675639c8131203859654b101d60953b0c74ed9e27c717384d6b8du256;
+const ALPHA_Y: u256 = 0x19818d29ec709a530771dea371b7819c73d4dcbe0f5fad3bf858775842a91d3fu256;
+const BETA_X1: u256 = 0x11ad0d4755480d587f72c0766c7182573a7f61f3f84090a88f5a8d24c1276da0u256;
+const BETA_X2: u256 = 0x2eae6bd9a84d2d05f8060973e06a8edcf10ff0bd697d746145d5395f25950bcau256;
+const BETA_Y1: u256 = 0x054ddc63046f86117db68009d923900a9769a7bbc7ff819cbe3eaedd9866b902u256;
+const BETA_Y2: u256 = 0x0dd39ace0502b09ce211468563219d704ba3d199b2e4b372d2f11c06a8a4e6fau256;
+const GAMMA_X1: u256 = 0x198e9393920d483a7260bfb731fb5d25f1aa493335a9e71297e485b7aef312c2u256;
+const GAMMA_X2: u256 = 0x1800deef121f1e76426a00665e5c4479674322d4f75edadd46debd5cd992f6edu256;
+const GAMMA_Y1: u256 = 0x090689d0585ff075ec9e99ad690c3395bc4b313370b38ef355acdadcd122975bu256;
+const GAMMA_Y2: u256 = 0x12c85ea5db8c6deb4aab71808dcb408fe3d1e7690c43d37b4ce6cc0166fa7daau256;
+const DELTA_X1: u256 = 0x05d482d0b371bbebdd56d9ceeeba2c600ccee0b2e08fa991867b6cad6f21d0ccu256;
+const DELTA_X2: u256 = 0x0f24d96d5f427fcc4a30fe65a2a73162de28bd6324905f22c6437b488c5515e1u256;
+const DELTA_Y1: u256 = 0x08f9635c9048c9e62ee2324f2d279cc108a43343a399984545e4114fdb784d20u256;
+const DELTA_Y2: u256 = 0x1a777d491272a6ef72a0030bded32fe11b990d828c4272ffe0b7448c71758459u256;
 
+// TODO - probably don't need this in snarkjs
 const PUBLIC_INPUT_LEN = 1;
 
 // IC depends on the number of public inputs
-const IC: [G1Point; 2] = [
-    G1Point {
-        x: 0xcb15ff28cc32c411dc8518ed7b84462e03569a2c8a3a27b8c6fb77318a1b798u256,
-        y: 0x5cbe1e78918f9f672d64b6dd43ded30e335b1bca19ecb55974e7a22570504d1u256,
-    },
-    G1Point {
-        x: 0x1ea2b93521113cb42d03ef7854eb2ba2bcafb93f523d9cc24957fedd7e10536cu256,
-        y: 0x2b77fa51d4fff879e6203624c339f06bf92057921ab038b72e58077ea6ff9fcdu256,
-    },
-];
+const IC0_X: u256 = 0xcb15ff28cc32c411dc8518ed7b84462e03569a2c8a3a27b8c6fb77318a1b798u256;
+const IC0_Y: u256 = 0x5cbe1e78918f9f672d64b6dd43ded30e335b1bca19ecb55974e7a22570504d1u256;
+
+const IC1_X: u256 = 0x1ea2b93521113cb42d03ef7854eb2ba2bcafb93f523d9cc24957fedd7e10536cu256;
+const IC1_Y: u256 = 0x2b77fa51d4fff879e6203624c339f06bf92057921ab038b72e58077ea6ff9fcdu256;
+
 
 abi Groth16Verifier {
     fn verify_proof(
@@ -87,64 +62,67 @@ impl Groth16Verifier for Contract {
         };
 
         // compute the linear combination of X
-        let mut i = 0;
-        let mut x = G1Point{
-                x: IC[i].x,
-                y: IC[i].y,
-            };
+        let mut x: [u256; 2] = [IC0_X, IC0_Y];
+        let mut scalar_mul_input: [u256; 3] = [0; 3];
+        let mut scalar_mul_output: [u256; 2] = [0; 2];
+        let mut point_add_input: [u256; 4] = [0; 4];
 
-        while i < PUBLIC_INPUT_LEN {
-            let a_i = Scalar {
-                x: pub_signals[i],
-            };
-            let ic_i = G1Point {
-                x: IC[i+1].x,
-                y: IC[i+1].y,
-            };
-            x = G1Point::point_add(x, G1Point::scalar_mul(ic_i, a_i));
-            i+=1;
-        };
+        //loop generate based on input len
+        scalar_mul_input[0] = IC1_X;
+        scalar_mul_input[1] = IC1_Y;
+        scalar_mul_input[2] = pub_signals[0];
+        // a_i * ic_i+1
+        asm(rA: scalar_mul_output, rB: 0, rC: 1, rD: scalar_mul_input) {
+            ecop rA rB rC rD;
+        }
+        // x + a * ic
+        point_add_input[0] = x[0];
+        point_add_input[1] = x[1];
+        point_add_input[2] = scalar_mul_output[0];
+        point_add_input[3] = scalar_mul_output[1];
+        asm(rA: x, rB: 0, rC: 0, rD: point_add_input) {
+            ecop rA rB rC rD;
+        }
+        // end of loop
+
+
+
 
         // check the pairing equation
         let mut pairing_input: [u256; 24] = [0; 24];
-        // neg A
-        let a_neg = G1Point{
-            x: p_a[0],
-            y: (Q - p_a[1]) % Q
-        };
 
         // -A
-        pairing_input[0] = a_neg.x;
-        pairing_input[1] = a_neg.y;
+        pairing_input[0] = p_a[0];
+        pairing_input[1] = (Q - p_a[1]) % Q;
         // B
         pairing_input[2] = p_b[0][0];
         pairing_input[3] = p_b[0][1];
         pairing_input[4] = p_b[1][0];
         pairing_input[5] = p_b[1][1];
         // alpha
-        pairing_input[6] = ALPHA.x;
-        pairing_input[7] = ALPHA.y;
+        pairing_input[6] = ALPHA_X;
+        pairing_input[7] = ALPHA_Y;
         // beta
-        pairing_input[8] = BETA.x[0];
-        pairing_input[9] = BETA.x[1];
-        pairing_input[10] = BETA.y[0];
-        pairing_input[11] = BETA.y[1];
+        pairing_input[8] = BETA_X1;
+        pairing_input[9] = BETA_X2;
+        pairing_input[10] = BETA_Y1;
+        pairing_input[11] = BETA_Y2;
         // x
-        pairing_input[12] = x.x;
-        pairing_input[13] = x.y;
+        pairing_input[12] = x[0];
+        pairing_input[13] = x[1];
         // gamma
-        pairing_input[14] = GAMMA.x[0];
-        pairing_input[15] = GAMMA.x[1];
-        pairing_input[16] = GAMMA.y[0];
-        pairing_input[17] = GAMMA.y[1];
+        pairing_input[14] = GAMMA_X1;
+        pairing_input[15] = GAMMA_X2;
+        pairing_input[16] = GAMMA_Y1;
+        pairing_input[17] = GAMMA_Y2;
         // c
         pairing_input[18] = p_c[0];
         pairing_input[19] = p_c[1];
         // delta
-        pairing_input[20] = DELTA.x[0];
-        pairing_input[21] = DELTA.x[1];
-        pairing_input[22] = DELTA.y[0];
-        pairing_input[23] = DELTA.y[1];
+        pairing_input[20] = DELTA_X1;
+        pairing_input[21] = DELTA_X2;
+        pairing_input[22] = DELTA_Y1;
+        pairing_input[23] = DELTA_Y2;
 
         let curve_id: u32 = 0;
         let groups_of_points: u32 = 4;
